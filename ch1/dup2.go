@@ -3,7 +3,6 @@
 /**
  * This program prints a duplicated line preceded by its countl, expansion of dup1.go
  * Usage: Use with stdin or with a list of named files.
- * UNFINISHED, NOT WORKING YET
  */
 
 package main
@@ -18,22 +17,29 @@ func main() {
 	counts := make(map[string]int)
 	files := os.Args[1:]
 	if len(files) == 0 {
-
+		countLines(os.Stdin, counts)
 	} else {
-
+		for _, file := range files {
+			f, err := os.Open(file)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "dup2 error: %v\n", err)
+				continue
+			}
+			countLines(f, counts)
+			f.Close()
+		}
 	}
-	input := bufio.NewScanner(os.Stdin)
-	for input.Scan() {
-		counts[input.Text()]++
-	}
-	// NOTE: ignoring potential errors from input.Err()
-	for line, n := range counts {
-		if n > 1 {
-			fmt.Printf("%d\t%s\n", n, line)
+	for line, count := range counts {
+		if count > 1 {
+			fmt.Printf("%d\t%s\n", count, line)
 		}
 	}
 }
 
 func countLines(f *os.File, counts map[string]int) {
-
+	input := bufio.NewScanner(f)
+	for input.Scan() {
+		counts[input.Text()]++
+	}
+	// NOTE: ignoring potential errors from input.Err()
 }
