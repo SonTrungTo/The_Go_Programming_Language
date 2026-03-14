@@ -32,14 +32,15 @@ func main() {
 			}
 			input := bufio.NewScanner(bytes.NewReader(b))
 			for input.Scan() {
-				counts[input.Text()]++
-				if where[input.Text()] == "" {
-					where[input.Text()] = file
+				line := input.Text()
+				counts[line]++
+				if where[line] == "" {
+					where[line] = file
 					// This is problematic if execute: input1.bak.txt input1.txt and both has "hello"
 					// } else if !strings.Contains(where[input.Text()], file) {
 				} else {
 					exist := false
-					files := strings.Split(where[input.Text()], ", ")
+					files := strings.Split(where[line], ", ")
 					for _, f := range files {
 						if f == file {
 							exist = true
@@ -47,7 +48,7 @@ func main() {
 						}
 					}
 					if !exist {
-						where[input.Text()] += ", " + file
+						where[line] += ", " + file
 					}
 				}
 			}
