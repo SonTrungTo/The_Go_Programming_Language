@@ -35,15 +35,33 @@ func main() {
 				counts[input.Text()]++
 				if where[input.Text()] == "" {
 					where[input.Text()] = file
-				} else if !strings.Contains(where[input.Text()], file) {
-					where[input.Text()] += ", " + file
+					// This is problematic if execute: input1.bak.txt input1.txt and both has "hello"
+					// } else if !strings.Contains(where[input.Text()], file) {
+				} else {
+					exist := false
+					files := strings.Split(where[input.Text()], ", ")
+					for _, f := range files {
+						if f == file {
+							exist = true
+							break
+						}
+					}
+					if !exist {
+						where[input.Text()] += ", " + file
+					}
 				}
+			}
+			// Handling input error
+			inputErr := input.Err()
+			if inputErr != nil {
+				fmt.Fprintf(os.Stderr, "dup err: scanning %s: %v\n", file, inputErr)
+				continue
 			}
 		}
 	}
 	for line, count := range counts {
 		if count > 1 {
-			fmt.Printf("%d\t%s\t\t%s\n", count, line, where[line])
+			fmt.Printf("%d\t%s\t%s\n", count, line, where[line])
 		}
 	}
 }
